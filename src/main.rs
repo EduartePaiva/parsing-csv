@@ -2,8 +2,10 @@ use parsing_pcrocedimentos::parsers::{
     file_manipulation::{read_the_file, save_the_file},
     parse::{
         neurocirurgia_procedimentos_principais, neurocirurgia_procedimentos_sequenciais,
-        oncologia_procedimentos_principais, oncologia_procedimentos_sequenciais,
+        neurocirurgia_relations, oncologia_procedimentos_principais,
+        oncologia_procedimentos_sequenciais, oncologia_relations,
         ortopedia_procedimentos_principais, ortopedia_procedimentos_sequenciais,
+        ortopedia_relations,
     },
 };
 
@@ -26,7 +28,9 @@ fn main() {
 
     // Trabalhando tabela procedimentos sequenciais
     let mut procedimentos_sequenciais = ortopedia_procedimentos_sequenciais(ortopedia.clone());
-    procedimentos_sequenciais.extend(neurocirurgia_procedimentos_sequenciais(neurocirurgia));
+    procedimentos_sequenciais.extend(neurocirurgia_procedimentos_sequenciais(
+        neurocirurgia.clone(),
+    ));
     procedimentos_sequenciais.extend(oncologia_procedimentos_sequenciais(oncologia.clone()));
 
     let mut procedimentos_sequenciais: String = procedimentos_sequenciais.into_iter().collect();
@@ -35,4 +39,13 @@ fn main() {
         "./src/procedimentos_sequenciais.csv",
         procedimentos_sequenciais,
     );
+
+    // Trabalhando tabela relações
+    let relacoes = ortopedia_relations(ortopedia)
+        + "\n"
+        + neurocirurgia_relations(neurocirurgia).as_str()
+        + "\n"
+        + oncologia_relations(oncologia).as_str();
+
+    save_the_file("./src/relacoes.csv", relacoes);
 }

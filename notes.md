@@ -13,5 +13,6 @@ co_procedimento | tipo
 2 = Sequencial:(Compatíveis Seq.)
 
 relacionamentos
-
 id_principal, id_sequencial, tipo_relacao (sequencial, sequencial sequencial)
+1 = sequencial
+2 = Sequencial:(Compatíveis Seq.)
