@@ -121,13 +121,13 @@ pub fn oncologia_procedimentos_sequenciais(data: String) -> HashSet<String> {
 pub fn ortopedia_relations(data: String) -> String {
     let mut output = String::new();
 
-    let mut co_procedimento = "";
+    let mut co_procedimento_principal = "";
     let mut cur_type = "";
     for line in data.lines() {
         let cols: Vec<_> = line.split(',').collect();
         match cols[0] {
             "Procedimento:" => {
-                co_procedimento = cols[1]
+                co_procedimento_principal = cols[1]
                     .split_whitespace()
                     .next()
                     .unwrap()
@@ -138,12 +138,13 @@ pub fn ortopedia_relations(data: String) -> String {
             "Sequencial:(Compatíveis Seq.)" => cur_type = "2",
             _ => (),
         }
-        let co_sequencial = cols[1]
+        let co_procedimento = cols[1]
             .split_whitespace()
             .next()
             .unwrap()
             .trim_end_matches('-');
-        output = output + co_procedimento + "," + co_sequencial + "," + cur_type + ",1\n";
+        output =
+            output + co_procedimento_principal + "," + co_procedimento + "," + cur_type + ",1\n";
     }
 
     output.pop();
@@ -153,7 +154,7 @@ pub fn ortopedia_relations(data: String) -> String {
 pub fn neurocirurgia_relations(data: String) -> String {
     let mut output = String::new();
 
-    let mut co_procedimento = String::new();
+    let mut co_procedimento_principal = String::new();
 
     for line in data.lines() {
         let cols: Vec<_> = line.split(',').collect();
@@ -166,11 +167,11 @@ pub fn neurocirurgia_relations(data: String) -> String {
             .replace("-", "")
             .replace("\"", "");
         if cols[0] == "Procedimento" {
-            co_procedimento = codigo;
+            co_procedimento_principal = codigo;
             continue;
         }
-        let co_sequencial = &codigo;
-        output = output + co_procedimento.as_str() + "," + co_sequencial + ",1,2\n";
+        let co_procedimento = &codigo;
+        output = output + co_procedimento_principal.as_str() + "," + co_procedimento + ",1,2\n";
     }
 
     output.pop();
@@ -182,13 +183,13 @@ pub fn oncologia_relations(data: String) -> String {
 
     for line in data.lines().skip(1) {
         let cols: Vec<_> = line.split(',').collect();
-        let co_procedimento = cols[0].split_whitespace().next().unwrap();
+        let co_procedimento_principal = cols[0].split_whitespace().next().unwrap();
 
-        for co_sequencial in cols.into_iter().skip(1) {
+        for co_procedimento in cols.into_iter().skip(1) {
             output = output
-                + co_procedimento
+                + co_procedimento_principal
                 + ","
-                + co_sequencial.replace("\"", "").replace(" ", "").as_str()
+                + co_procedimento.replace("\"", "").replace(" ", "").as_str()
                 + ",1,3\n";
         }
     }
