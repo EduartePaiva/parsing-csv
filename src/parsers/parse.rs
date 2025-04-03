@@ -1,50 +1,57 @@
+use serde::Serialize;
 use std::collections::HashSet;
 
-pub fn ortopedia_procedimentos_principais(data: String) -> String {
-    let mut output = String::new();
+#[derive(Debug, PartialEq, Serialize)]
+pub struct ProcedimentosPrincipais {
+    co_procedimento: String,
+    portaria: String,
+}
+
+pub fn ortopedia_procedimentos_principais(data: String) -> Vec<ProcedimentosPrincipais> {
+    let mut output = vec![];
 
     for line in data.lines() {
         let strs = line.split(",").collect::<Vec<_>>();
         if strs[0] == "Procedimento:" {
-            output = output
-                + strs[1]
+            output.push(ProcedimentosPrincipais {
+                co_procedimento: strs[1]
                     .split_whitespace()
                     .next()
                     .unwrap()
                     .trim_end_matches('-')
-                + ",1\n"
+                    .to_owned(),
+                portaria: "1".to_owned(),
+            });
         }
     }
-    output.pop();
 
     return output;
 }
 
-pub fn neurocirurgia_procedimentos_principais(data: String) -> String {
-    let mut output = String::new();
+pub fn neurocirurgia_procedimentos_principais(data: String) -> Vec<ProcedimentosPrincipais> {
+    let mut output = vec![];
 
     for line in data.lines() {
         let strs = line.split(",").collect::<Vec<_>>();
         if strs[0] == "Procedimento" {
-            output = output
-                + strs[1]
+            output.push(ProcedimentosPrincipais {
+                co_procedimento: strs[1]
                     .split_whitespace()
                     .next()
                     .unwrap()
                     .replace(".", "")
                     .replace("-", "")
-                    .replace("\"", "")
-                    .as_str()
-                + ",2\n"
+                    .replace("\"", ""),
+                portaria: "2".to_owned(),
+            });
         }
     }
-    output.pop();
 
     return output;
 }
 
-pub fn oncologia_procedimentos_principais(data: String) -> String {
-    let mut output = String::new();
+pub fn oncologia_procedimentos_principais(data: String) -> Vec<ProcedimentosPrincipais> {
+    let mut output = vec![];
 
     for line in data.lines().skip(1) {
         let co_procedimento = line
@@ -55,9 +62,11 @@ pub fn oncologia_procedimentos_principais(data: String) -> String {
             .next()
             .unwrap();
 
-        output = output + co_procedimento + ",3\n"
+        output.push(ProcedimentosPrincipais {
+            co_procedimento: co_procedimento.to_owned(),
+            portaria: "3".to_owned(),
+        });
     }
-    output.pop();
 
     return output;
 }
@@ -212,8 +221,16 @@ Sequencial:,0408060344 - RETIRADA DE ESPACADORES / OUTROS MATERIAIS
 ,0408060352 - RETIRADA DE FIO OU PINO INTRA-OSSEO
 ,0408060379 - RETIRADA DE PLACA E/OU PARAFUSOS";
 
-        let output = "0408010029,1
-0408010045,1";
+        let output = vec![
+            ProcedimentosPrincipais {
+                co_procedimento: "0408010029".to_owned(),
+                portaria: "1".to_owned(),
+            },
+            ProcedimentosPrincipais {
+                co_procedimento: "0408010045".to_owned(),
+                portaria: "1".to_owned(),
+            },
+        ];
         assert_eq!(
             ortopedia_procedimentos_principais(input.to_string()),
             output

@@ -15,11 +15,13 @@ fn main() {
     let neurocirurgia = read_the_file("./src/neurocirurgia.csv");
     let oncologia = read_the_file("./src/oncologia.csv");
 
-    let procedimentos_principais = ortopedia_procedimentos_principais(ortopedia.clone())
-        + "\n"
-        + neurocirurgia_procedimentos_principais(neurocirurgia.clone()).as_str()
-        + "\n"
-        + oncologia_procedimentos_principais(oncologia.clone()).as_str();
+    let mut procedimentos_principais = ortopedia_procedimentos_principais(ortopedia.clone());
+    procedimentos_principais.extend(neurocirurgia_procedimentos_principais(
+        neurocirurgia.clone(),
+    ));
+    procedimentos_principais.extend(odontologia_procedimentos_principais(neurocirurgia.clone()));
+
+    let procedimentos_principais = serde_json::to_string_pretty(&procedimentos_principais).unwrap();
 
     save_the_file(
         "./src/procedimentos_principais.csv",
