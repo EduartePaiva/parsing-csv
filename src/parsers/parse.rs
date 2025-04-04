@@ -135,9 +135,13 @@ pub fn ortopedia_relations(data: String) -> String {
                 continue;
             }
             "Sequencial:" => cur_type = "1",
-            "Sequencial:(Compatíveis Seq.)" => cur_type = "2",
             _ => (),
         }
+
+        if cols[0].to_ascii_lowercase().contains("comp") {
+            cur_type = "2";
+        }
+
         let co_procedimento = cols[1]
             .split_whitespace()
             .next()
