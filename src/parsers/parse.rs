@@ -123,6 +123,8 @@ pub fn ortopedia_relations(data: String) -> String {
 
     let mut co_procedimento_principal = "";
     let mut cur_type = "";
+    let mut idx = 0;
+
     for line in data.lines() {
         let cols: Vec<_> = line.split(',').collect();
         match cols[0] {
@@ -132,6 +134,7 @@ pub fn ortopedia_relations(data: String) -> String {
                     .next()
                     .unwrap()
                     .trim_end_matches('-');
+                idx = 0;
                 continue;
             }
             "Sequencial:" => cur_type = "1",
@@ -147,8 +150,17 @@ pub fn ortopedia_relations(data: String) -> String {
             .next()
             .unwrap()
             .trim_end_matches('-');
-        output =
-            output + co_procedimento_principal + "," + co_procedimento + "," + cur_type + ",1\n";
+        output = output
+            + co_procedimento_principal
+            + ","
+            + co_procedimento
+            + ","
+            + cur_type
+            + ",1,"
+            + idx.to_string().as_str()
+            + "\n";
+
+        idx += 1;
     }
 
     output.pop();
@@ -159,6 +171,7 @@ pub fn neurocirurgia_relations(data: String) -> String {
     let mut output = String::new();
 
     let mut co_procedimento_principal = String::new();
+    let mut idx = 0;
 
     for line in data.lines() {
         let cols: Vec<_> = line.split(',').collect();
@@ -172,10 +185,18 @@ pub fn neurocirurgia_relations(data: String) -> String {
             .replace("\"", "");
         if cols[0] == "Procedimento" {
             co_procedimento_principal = codigo;
+            idx = 0;
             continue;
         }
         let co_procedimento = &codigo;
-        output = output + co_procedimento_principal.as_str() + "," + co_procedimento + ",1,2\n";
+        output = output
+            + co_procedimento_principal.as_str()
+            + ","
+            + co_procedimento
+            + ",1,2,"
+            + idx.to_string().as_str()
+            + "\n";
+        idx += 1;
     }
 
     output.pop();
@@ -189,12 +210,14 @@ pub fn oncologia_relations(data: String) -> String {
         let cols: Vec<_> = line.split(',').collect();
         let co_procedimento_principal = cols[0].split_whitespace().next().unwrap();
 
-        for co_procedimento in cols.into_iter().skip(1) {
+        for (idx, co_procedimento) in cols.into_iter().skip(1).enumerate() {
             output = output
                 + co_procedimento_principal
                 + ","
                 + co_procedimento.replace("\"", "").replace(" ", "").as_str()
-                + ",1,3\n";
+                + ",1,3,"
+                + idx.to_string().as_str()
+                + "\n";
         }
     }
 
@@ -341,7 +364,7 @@ Sequencial:,0408060387 - RETIRADA DE PROTESE DE SUBSTITUICAO DE GRANDES ARTICULA
 ,0408060352 - RETIRADA DE FIO OU PINO INTRA-OSSEO";
 
         let output =
-            "0408010029,0408060387,1,1\n0408010029,0408060344,1,1\n0408010029,0408060352,1,1";
+            "0408010029,0408060387,1,1,0\n0408010029,0408060344,1,1,1\n0408010029,0408060352,1,1,2";
 
         assert_eq!(ortopedia_relations(input.to_string()), output);
     }
@@ -354,7 +377,7 @@ Sequencial:(Compatíveis Seq.),0401020010 - ENXERTO COMPOSTO
 ,0401020029 - ENXERTO DERMO-EPIDÉRMICO";
 
         let output =
-            "0408020016,0408060514,1,1\n0408020016,0401020010,2,1\n0408020016,0401020029,2,1";
+            "0408020016,0408060514,1,1,0\n0408020016,0401020010,2,1,1\n0408020016,0401020029,2,1,2";
 
         assert_eq!(ortopedia_relations(input.to_string()), output);
     }
@@ -367,7 +390,7 @@ Sequencial,04.08.03.037-2 - Descompressão óssea na junção crânio-cervical v
 ,04.03.01.010-1 - Derivação ventricular para peritôneo / átrio / pleura / raque";
 
         let output =
-            "0403010039,0408030372,1,2\n0403010039,0403010098,1,2\n0403010039,0403010101,1,2";
+            "0403010039,0408030372,1,2,0\n0403010039,0403010098,1,2,1\n0403010039,0403010101,1,2,2";
 
         assert_eq!(neurocirurgia_relations(input.to_string()), output);
     }
@@ -377,7 +400,7 @@ Sequencial,04.08.03.037-2 - Descompressão óssea na junção crânio-cervical v
 0416010016 - Amputação de pênis em oncologia,"0409050091, 0409020168, 0416020020, 0416020232, 0416020259"
 0416010024 - Cistectomia total e derivação em 1 só tempo em oncologia,"0416010040, 0416020020""#;
 
-        let output = "0416010016,0409050091,1,3\n0416010016,0409020168,1,3\n0416010016,0416020020,1,3\n0416010016,0416020232,1,3\n0416010016,0416020259,1,3\n0416010024,0416010040,1,3\n0416010024,0416020020,1,3";
+        let output = "0416010016,0409050091,1,3,0\n0416010016,0409020168,1,3,1\n0416010016,0416020020,1,3,2\n0416010016,0416020232,1,3,3\n0416010016,0416020259,1,3,4\n0416010024,0416010040,1,3,0\n0416010024,0416020020,1,3,1";
 
         assert_eq!(oncologia_relations(input.to_string()), output);
     }

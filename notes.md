@@ -20,7 +20,7 @@ id_principal, id_sequencial, tipo_relacao (sequencial, sequencial sequencial)
 cabecalhos:
 
 relações:  
-co_procedimento_principal,co_procedimento,tipo_relacao,portaria
+co_procedimento_principal,co_procedimento,tipo_relacao,portaria,index
 
 procedimentos_sequenciais:  
 co_procedimento,portaria
